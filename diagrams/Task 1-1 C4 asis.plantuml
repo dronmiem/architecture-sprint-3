@@ -1,0 +1,11 @@
+@startuml
+!include ./C4_Container.puml
+
+Enterprise_Boundary(e1,  "Smart home (Heating control system)"){
+    System_Boundary(s1, "Domain: Heating control"){
+        Container(backend, "Subdomain: Heating control system", "java", "Makes it possible to control the temperature. Turn on/off the heating")
+        Container(backend_api, "Subdomain: Sensor system", "java", "Receives data from temperature sensors")
+    }
+}
+
+@enduml

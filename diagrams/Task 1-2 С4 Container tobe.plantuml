@@ -1,0 +1,45 @@
+@startuml
+!include ./C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Manages the house")
+
+System_Boundary(SmartHome, "Smart home (Heating control system)") {
+    Container(web_app, "Web application", "An application for user interaction with microservices")
+    Container(gateWay, "API gateway")
+  
+    Container_Boundary(users, "Users manager container") {
+        Container(users_s, Microservice "User Management", "Java")   
+    }
+
+    Container_Boundary(device, "Device manager container") {
+        Container(device_s, Microservice "Device Management", "Java")   
+    }
+    
+    Container_Boundary(telemetry, "Device manager container") {
+        Container(telemetry_s, Microservice "Telemetry", "Java") 
+    }
+
+    Rel_D(user, web_app, "")
+    Rel_D(web_app, gateWay, "Requests")
+    Rel_D(gateWay, users_s, "Synchronous API method call. Performs user registration and management.")
+    Rel_D(gateWay, telemetry_s, "Asynchronous API call. Getting information from sensors")
+    Rel_D(gateWay, device_s, "Synchronous API method call. Device registration/management")
+}
+
+System_Ext(heating_system_ext, "Heating system", "")
+System_Ext(gate_system_ext, "Gate management system", "")
+System_Ext(video_system_ext, "Video surveillance system", "")
+System_Ext(light_system_ext, "Lighting system", "")
+
+Rel_D(device_s, heating_system_ext, "Heating control")
+Rel_D(device_s, gate_system_ext, "Gate management")
+Rel_D(device_s, video_system_ext, "Video surveillance management")
+Rel_D(device_s, light_system_ext, "Lighting control")
+Rel_D(telemetry_s, heating_system_ext, "Reading data")
+Rel_D(telemetry_s, gate_system_ext, "Reading data")
+Rel_D(telemetry_s, video_system_ext, "Reading data")
+Rel_D(telemetry_s, light_system_ext, "Reading data")
+
+@enduml

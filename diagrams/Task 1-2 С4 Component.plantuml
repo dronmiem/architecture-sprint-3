@@ -1,0 +1,64 @@
+@startuml
+  !include ./C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Manages the house")
+Enterprise_Boundary(SmartHome, "Smart home (Heating control system)"){
+    Container(web_app, "Web application", "An application for user interaction with microservices")
+    Container(gateWay, "API gateway")
+
+    Container_Boundary(users, "Users manager") {
+        Container(user_c, "User controller", "Java")
+        Container(user_s, Microservice "Users manager", "Java")
+        ContainerDb(user_s_db, "Users Database", "", "PostgeSQL")
+        
+        Rel_D(user_c, user_s, "")
+        Rel_L(user_s, user_s_db, "Reading/Writing data")
+    }
+    Container_Boundary(device, "Device Management") {
+        Container(device_c, "Device controller", "Java")
+        Container(device_s, Microservice "Device Management", "Java")
+        ContainerDb(device_s_db, "Devices Database", "", "PostgeSQL")
+        
+        Rel_D(device_c, device_s, "")
+        Rel_L(device_s, device_s_db, "Reading/Writing data")
+    }
+    Container_Boundary(telemetry, "Telemetry") {
+        Container(telemetry_c, "Telemetry controller", "Java")
+        Container(telemetry_s, Microservice "Telemetry", "Java")
+        ContainerDb(telemetry_db, "Telemetry database", "", "PostgeSQL")
+        ContainerQueue(telemetry_queue, "Queue for data synchronization", "Java")
+        Container(telemetry_queue_prc, "Queue handler for data synchronization", "Java")
+        
+        Rel_D(telemetry_c, telemetry_s, "")
+        Rel_R(telemetry_queue_prc, telemetry_db, "")
+        Rel_D(telemetry_queue_prc, telemetry_queue, "")
+        Rel_D(telemetry_s, telemetry_queue, "")
+        Rel_D(telemetry_s, telemetry_db, "Reading/Writing data")
+    }
+
+    System_Ext(heating_system_ext, "Heating system", "")
+    System_Ext(gate_system_ext, "Gate management system", "")
+    System_Ext(video_system_ext, "Video surveillance system", "")
+    System_Ext(light_system_ext, "Lighting system", "")
+
+    Rel_D(device_s, heating_system_ext, "Heating control")
+    Rel_D(device_s, gate_system_ext, "Gate management")
+    Rel_D(device_s, video_system_ext, "Video surveillance management")
+    Rel_D(device_s, light_system_ext, "Lighting control")
+    Rel_D(telemetry_s, heating_system_ext, "Reading data")
+    Rel_D(telemetry_s, gate_system_ext, "Reading data")
+    Rel_D(telemetry_s, video_system_ext, "Reading data")
+    Rel_D(telemetry_s, light_system_ext, "Reading data")
+
+
+    Rel_D(user, web_app, "")
+    Rel_D(web_app, gateWay, "")
+    Rel_D(gateWay, user_c, "")
+    Rel_D(gateWay, device_c, "")
+    Rel(gateWay, telemetry_c, "")
+    Rel(telemetry_s, device_c, "")
+    Rel(user_s, device_c, "")
+
+@enduml

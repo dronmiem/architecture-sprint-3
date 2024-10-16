@@ -1,0 +1,18 @@
+@startuml
+!include ./C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Manages the house")
+System_Boundary(heating, "Heating system") {
+    System(heatingSystem, "Heating system", "controls heating and temperature indicators")
+}
+System_Ext(heater, "Ext Heating system", "Returns the temperature from the sensor and processes temperature control requests")
+
+Rel_D(user, heatingSystem, "On\Off heating")
+Rel_D(user, heatingSystem, "Set temperature")
+Rel_D(heatingSystem, user, "Get temperature")
+Rel_R(heatingSystem, heater, "Get temperature")
+Rel_R(heatingSystem, heater, "Temperature control")
+
+@enduml
