@@ -1,0 +1,51 @@
+@startuml
+
+package "Microservice Users manager" as user {
+    class UserController {
+        +getUser(userId)
+        +getUsers(login, name)
+        +getHouse(houseId)
+        +createUser(login, name)
+        +createHouse(userId)
+        +updateUser(userId)
+        +updateHouse(houseId)
+        +deleteUser(userId) 
+        +deleteHouse(houseId)
+    }
+    class UserService {
+        +getUser(long userId)
+        +getHouse(houseId)
+        +getUsers(login, name)
+        +createUser(login, name)
+        +createHouse(userId)
+        +updateUser(userId)
+        +updateHouse(houseId)
+        +deleteUser(userId)
+        +deleteHouse(houseId))
+    }
+
+    UserController --> UserService
+}
+
+package "Microservice Device Management" as device {
+    class DeviceController {
+        +getDevice(deviceId))
+        +createDevice(houseId, userId)
+        +updateDevice(deviceId)
+        +deleteDevice(deviceId)
+        +setTemperature(deviceId, temperature)
+        +getTemperature(deviceId)
+    }
+    class DeviceService {
+        +getDevice(deviceId)
+        +createDevice(houseId, userId)
+        +updateDevice(deviceId)
+        +deleteDevice(deviceId)
+        +setTemperature(deviceId, temperature)
+        +getTemperature(deviceId)
+    }
+
+    DeviceController --> DeviceService
+}
+
+@enduml

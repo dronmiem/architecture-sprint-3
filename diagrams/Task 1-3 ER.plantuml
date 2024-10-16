@@ -1,0 +1,64 @@
+@startuml
+package user_package as "Microservice User Managemen" {
+    entity user {
+        * id
+        login
+        password
+        update_date
+        status
+    }
+    
+    entity house {
+        * id
+        name
+        user_id [FK to user.id]
+        address
+        update_date
+        status
+
+    }
+    user --{ house
+
+}
+
+package device_package as "Microservice Device Managemen" {
+    entity device {
+        * id
+        name
+        user_id [FK to user.id]
+        house_id [FK to house.id]
+        device_type_code [FK to device_type.code]
+        status
+        current_temperature
+        isOpen
+        update_date
+    }
+
+    entity device_type {
+        * id
+        name
+        code 
+        description
+        status
+    }
+
+    device --* device_type
+}
+
+package telemetry as "Microservice Telemetry" {
+    entity telemetry_data {
+        * id
+        device_id
+        house_id
+        current_temperature
+        isOn
+        video_data
+    }
+}
+
+house -L-{ device
+user -L-{ device
+
+telemetry -R-{ device
+
+@enduml

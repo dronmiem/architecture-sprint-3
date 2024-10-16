@@ -1,85 +1,55 @@
-# Базовая настройка
+Задание 1.1: Анализ и планирование
 
-## Запуск minikube
+Функциональность монолитного приложения
+1. Управление отоплением
+1.1 Пользователи могут удалённо включать/выключать отопление в своих домах.
+1.2 Пользователи могут устанавливать желаемую температуру.
+1.3 Система автоматически поддерживает заданную температуру, регулируя подачу тепла.
 
-[Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
+2 Мониторинг температуры
+2.1 Система получает данные о температуре с датчиков, установленных в домах.
+2.2 Пользователи могут просматривать текущую температуру в своих домах через веб-интерфейс.
 
-```bash
-minikube start
-```
 
-## Добавление токена авторизации GitHub
+Анализ архитектуры монолитного приложения:
+Плюсы:
+1 Простая архитектура для восприятия командой
+Минусы:
+1 Пользователь не может самостоятельно подключать устройства (доп. нагрузка на инженеров)
+2 Ограниченность функциональных возможностей
+3 Нет асинхронных вызовов (может привести к сбоям при большой нагрузке)
 
-[Получение токена](https://github.com/settings/tokens/new)
 
-```bash
-kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
-```
+Границы контекстов Domain-Driven Design
+1  "Управление отоплением" (Domain)
+1.1 "Система отопления" (SubDomain)
+1.2 "Система сбора данных с датчиков" (SubDomain) 
 
-## Установка API GW kusk
+Диаграммы:
+.\diagrams\Task 1-1 C4 mono.plantuml 
+.\diagrams\Task 1-1 C4 asis.plantuml
 
-[Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
 
-```bash
-kusk cluster install
-```
+Задание 1.2: Архитектура микросервисов
 
-## Смена адреса образа в helm chart
+Новое приложение решено делать с использованием микросервисов (с использованием асинхронных вызовов), что даст возможности к горизонтальному масштабированию, снижению потенциальной нагруки и упрощению поддержки. Т.к. команда знает и умеет писать на Java и использует Postgres, смена стека разработки не имеет смысла (Стек дает возможность реализовать все запланированные изменения). 
 
-После того как вы сделали форк репозитория и у вас в репозитории отработал GitHub Action. Вам нужно получить адрес образа <https://github.com/><github_username>/architecture-sprint-3/pkgs/container/architecture-sprint-3
+ПРоведя анализ DDD)Решено реализовать 3 микросервиса (по анализу DDD)
+1. "Управление пользователями" - Регистрация и управление пользователями
+2. "Управление устройствами" - Регистрация и управление устройствами
+3. "Телеметрия" - Получает данные с устройств и продеставляет их по запросу (подход CQRS - из-за большого кол-ва заросов на чтение\запись применение данного подхода имеет смысл)
 
-Он выглядит таким образом
-```ghcr.io/<github_username>/architecture-sprint-3:latest```
+Так же необходимо использовать инструмент для распределения запросов по микросервисам (в схемах Gateway)
 
-Замените адрес образа в файле `helm/smart-home-monolith/values.yaml` на полученный файл:
+Диаграммы:
+.\diagrams\Task 1-2 С4 Container.plantuml - этап MVP
+.\diagrams\Task 1-2 С4 Container tobe.plantuml 
+.\diagrams\Task 1-2 С4 Component.plantuml
+.\diagrams\Task 1-2 С4 Code.plantuml
 
-```yaml
-image:
-  repository: ghcr.io/<github_username>/architecture-sprint-3
-  tag: latest
-```
+Задание 1.3: ER-диаграмма
+Диаграмма:
+.\diagramsTask 1-3 ER.plantuml
 
-## Настройка terraform
-
-[Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
-
-Создайте файл ~/.terraformrc
-
-```hcl
-provider_installation {
-  network_mirror {
-    url = "https://terraform-mirror.yandexcloud.net/"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-```
-
-## Применяем terraform конфигурацию
-
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-## Настройка API GW
-
-```bash
-kusk deploy -i api.yaml
-```
-
-## Проверяем работоспособность
-
-```bash
-kubectl port-forward svc/kusk-gateway-envoy-fleet -n kusk-system 8080:80
-curl localhost:8080/hello
-```
-
-## Delete minikube
-
-```bash
-minikube delete
-```
+Задание 1.4: Создание и документирование API
+.\api.yaml
